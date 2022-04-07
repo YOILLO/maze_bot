@@ -1,0 +1,87 @@
+#pragma once 
+#include "project_config.h"
+#include "vl53l0x.h"
+#include "display.h"
+#define sizeX 42
+#define sizeY 42
+#define Flors 2
+
+/*
+системы кординат:
+Абсолютная:
+**0**
+*   *
+3   1  
+*   *
+**2**
+Относительная:
+**0**
+*   *
+-1  1  
+*   *
+**2**
+*/
+
+class Map_operations{
+    public:
+        Map_operations(vl53l0x& FrontDist,
+                       vl53l0x& RightDist,
+                       vl53l0x& LeftDist,
+                       vl53l0x& BotDist,
+                       OLED_GFX& workDisp);
+        uint16_t takeAbsSens(uint8_t dirT);
+        void makeMap();
+        int8_t dirRob();
+        bool robMap(int8_t derT);
+        bool robMapBl(int8_t derT);    
+        
+        void chngeCor(uint8_t dir);
+        
+        int8_t makeRoad(bool loop, uint8_t startX,uint8_t startY, uint8_t finishX, uint8_t finishY, bool moving);
+    
+        int8_t convAbsToRob(uint8_t dat);
+        uint8_t convRobToAbs(int8_t dat);
+    
+        void addBlackPiont();
+    
+        uint8_t Flor;
+        bool mapWall[Flors][sizeX*2][sizeY*2];
+        bool mapVizit[Flors][sizeX][sizeY];
+        bool mapingVizit[sizeX][sizeY];
+        uint8_t robCorX[Flors], robCorY[Flors]; 
+        uint8_t dir;
+        
+        struct point{
+            uint8_t x;
+            uint8_t y;
+            uint8_t dir;
+        };
+        
+        uint8_t TaleWhitePoints[Flors];
+        
+        point whitePoints[Flors][sizeX*sizeY];
+    
+        STRONG_ENUM( mapState, BFS, ROAD_MAKE );
+    private:
+        mapState::Type m_state;
+        
+        int8_t m_road[sizeX*sizeY];
+        
+        uint16_t m_head;
+        uint16_t m_tale;
+        uint16_t m_mapX;
+        uint16_t m_mapY;
+        
+        point m_hills[sizeX][sizeY];
+        
+        point m_stack[sizeX*sizeY];
+        
+        point m_roadMap[sizeX][sizeY];
+    
+        vl53l0x & m_FrontDist;
+        vl53l0x & m_RightDist;
+        vl53l0x & m_LeftDist;
+        vl53l0x & m_BotDist;
+    
+        OLED_GFX & m_workDisp;
+};
